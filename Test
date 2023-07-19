@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun  1 15:35:31 2022
+
+@author: claireyang
+"""
+
+# important !!
+import paramiko
+import datetime
+import time
+
+ssh1 = paramiko.SSHClient()
+ssh1.set_missing_host_key_policy(
+    paramiko.AutoAddPolicy())
+ssh1.connect('//', username='root',
+             password='//')
+session1 = paramiko.SSHClient()
+session1.load_system_host_keys()
+
+stdin, stdout, stderr = ssh1.exec_command('ITGRecv')  # 164执行命令listening
+res, err = stdout.read(), stderr.read()  # stdout.readline()
+result = res if res else err
+print(result.decode())
+
+ssh2 = paramiko.SSHClient()
+ssh2.set_missing_host_key_policy(
+    paramiko.AutoAddPolicy())
+ssh2.connect('138.68.74.199', username='root',
+             password='2yangdan')
+session2 = paramiko.SSHClient()
+session2.load_system_host_keys()
+
+# T1 = time.clock()
+# print(datetime.datetime.now())
+
+comm_mat = [];
+
+
+def bonsai(series):
+    for i in range(1, series + 1):
+        comm = "ITGSend -a 10.100.0.5 -C 100 -c 500 -t 900000 -l Send" + str(i) + '.log -x Recev' + str(i) + ".log"
+        # mov = "mv /root/Recev"+str(i) +'.log   /root/log_fileR'
+        # first = comm + " && " + mov
+        comm_mat.append(comm)
+    return (comm_mat)
+
+
+# length = len(bonsai(5))
+
+# bonsai(3)#输出变量确定需要多少个log，此处example
+
+def Sendbonsai(varr, minutes):
+    # command_text = bonsai(9)
+    # stdin, stdout, stderr = ssh.exec_command(command_text)   # 执行命令
+    length = len(varr)
+    print(length)
+
+    for j in range(0, length):
+        print(datetime.datetime.now())  # current time
+
+        stdin, stdout, stderr = ssh2.exec_command(varr[j])  # 执行命令
+        print(varr[j])
+        res, err = stdout.read(), stderr.read()  # stdout.readline()
+        result = res if res else err
+        print(result.decode())
+
+        time.sleep(minutes * 60)  #
+    # driver.implicitly_wait(10)
+
+
+Sendbonsai(bonsai(350), 1)  # 自定义文件数和时间s，半小时生成一个文件
+
+# def Sendbonsai(varr):
+#      #command_text = bonsai(9)
+#      #stdin, stdout, stderr = ssh.exec_command(command_text)   # 执行命令
+#      length = len(varr)
+#      print(length)
+
+#      stdin, stdout, stderr = ssh2.exec_command(varr[length-1] )  # 执行命令
+#      res, err = stdout.read(), stderr.read()          # stdout.readline()
+#      result = res if res else err
+#      print( result.decode())
+
+# Sendbonsai(bonsai(7))
+
+
+# def timeMachine(time , files):
+
+#     for i in range(1, files):
+#         schedule.every(time).seconds.do(Sendbonsai(bonsai(i)))
+
+# timeMachine(2 , 2)
+
+ssh1.close()
+ssh2.close()  # 关闭连接
+sh1 = paramiko.SSHClient()
+ssh1.set_missing_host_key_policy(
+    paramiko.AutoAddPolicy())
+ssh1.connect('//', username='root',  
+    password='//')
+session1 = paramiko.SSHClient()
+session1.load_system_host_keys()
+
+
+# stdin, stdout, stderr = ssh1.exec_command('ITGRecv')   # Bonsai2执行命令listening
+# res, err = stdout.read(), stderr.read()          # stdout.readline()
+# result = res if res else err
+# print( result.decode())
+
+
+# ssh2 = paramiko.SSHClient()
+# ssh2.set_missing_host_key_policy(
+#     paramiko.AutoAddPolicy())
+# ssh2.connect('//', username='root', 
+#     password='//')
+# session2 = paramiko.SSHClient()
+# session2.load_system_host_keys()
+
+
+
+# ssh = paramiko.SSHClient()
+# key = paramiko.AutoAddPolicy()
+# ssh.set_missing_host_key_policy(key)
+# ssh.connect('//', 22, 'root', '//' ,timeout=5)
+# stdin, stdout, stderr = ssh.exec_command(' cd log_fileR  && ls')
+
+# for i in stdout.readlines():
+#     print(i)
+
+
+comm_matt = []; 
+def  perferm(series):
+    for i in range(1,series+1):
+        cc = ' cd log_fileR  &&  ls'
+        cmd1= "ITGDec Recev"+str(i) +'.log -j 100 jitter' +str(i) + ".txt && mv jitter" + str(i) + ".txt ../Jitter " #100ms jitter
+        cmd2 = "ITGDec Recev"+str(i) +'.log -d 100 delay' +str(i) + ".txt && mv delay" + str(i) + ".txt ../Delay" #delay
+        cmd3 ="ITGDec Recev"+str(i) +'.log -p 100 pktloss' +str(i) + ".txt && mv pktloss" + str(i) + ".txt ../PktLoss" #pktloss
+        cmd4 = "ITGDec Recev"+str(i) +'.log -b 100 bitrate' +str(i) + ".txt && mv bitrate" + str(i) + ".txt ../BitRate" #bitrate
+        # comm=cmd1 + " && " + cmd2 + " && " + cmd3 + " && " + cmd4
+        mm = cc + " && " + cmd1 + " && " + cmd2+ " && " + cmd3 + " && " + cmd4
+        comm_matt.append(mm)
+    print(comm_matt)
+    return(comm_matt )
+
+perferm(3)
+    
+
+
+  # `ITGDec Recev1.log -j 100 jitter1.txt`
+
+
+# def exet(varr, seconds):
+#       length = len(varr)
+#       print(length)
+     
+#       for j in range(0, length):
+#         print(datetime.datetime.now()) # current time
+        
+#         stdin, stdout, stderr = ssh1.exec_command(varr[j] )  # 执行命令
+#         print(varr[j] )
+#         res, err = stdout.read(), stderr.read()          # stdout.readline()
+#         result = res if res else err
+#         print( result.decode())
+        
+#         time.sleep( seconds )  
+        
+# exet(perferm(3), 5 ) #自定义文件数和时间s，半小时生成一个文件
+
+ssh1.close() 
+# ssh2.close() 
+
